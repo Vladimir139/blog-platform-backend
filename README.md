@@ -1,5 +1,5 @@
 # Инициализируем проект
-go mod init myblog-backend
+go mod init blog-platform-backend
 
 # Устанавливаем фреймворк для API (Gin)
 go get -u github.com/gin-gonic/gin

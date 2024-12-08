@@ -5,9 +5,12 @@ import (
 	"blog-platform-backend/models"
 	"blog-platform-backend/routes"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 	// Подключаемся к базе
 	database.Connect()
 

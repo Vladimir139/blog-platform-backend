@@ -2,6 +2,7 @@ package routes
 
 import (
 	"blog-platform-backend/controllers"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,9 @@ func SetupRouter() *gin.Engine {
 	// Публичные роуты
 	r.GET("/posts", controllers.GetPosts)
 	r.GET("/posts/:id", controllers.GetPostByID)
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Welcome to the blog platform API"})
+	})
 
 	// Группа роутов под авторизацией
 	auth := r.Group("/")
