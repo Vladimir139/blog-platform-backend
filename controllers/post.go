@@ -51,10 +51,12 @@ func CreatePost(c *gin.Context) {
 // GetPosts - получить все посты
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
-	if err := database.DB.Find(&posts).Error; err != nil {
+
+	if err := database.DB.Preload("Author").Find(&posts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch posts"})
 		return
 	}
+
 	c.JSON(http.StatusOK, posts)
 }
 
@@ -150,4 +152,34 @@ func DeletePost(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Post deleted successfully"})
+}
+
+func LikePost(c *gin.Context) {
+	id := c.Param("id")
+	var post models.Post
+
+	if err := database.DB.First(&post, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	post.Likes += 1
+	if err := database.DB.Save(&post).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like post"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"likes": post.Likes})
+}
+
+func GetUserPosts(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	var posts []models.Post
+	if err := database.DB.Where("user_id = ?", userID).Find(&posts).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch posts"})
+		return
+	}
+
+	c.JSON(http.StatusOK, posts)
 }

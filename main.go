@@ -4,6 +4,7 @@ import (
 	"blog-platform-backend/database"
 	"blog-platform-backend/models"
 	"blog-platform-backend/routes"
+	"blog-platform-backend/seeders"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -19,6 +20,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to migrate: %v", err)
 	}
+
+	// Выполнение сидеров
+	log.Println("Seeding database...")
+	users := seeders.SeedUsers()
+	seeders.SeedPosts(users)
 
 	// Настраиваем роутер
 	r := routes.SetupRouter()
