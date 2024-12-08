@@ -12,8 +12,6 @@ import (
 
 // CreatePost - создание поста
 func CreatePost(c *gin.Context) {
-	// Предполагается, что пользователь уже аутентифицирован
-	// Предположим, что в контексте (через мидлвару JWT) есть user_id
 	userID, ok := c.Get("user_id")
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -21,10 +19,11 @@ func CreatePost(c *gin.Context) {
 	}
 
 	var input struct {
-		Title     string `json:"title" binding:"required"`
-		Featured  bool   `json:"featured"`
-		ShortDesc string `json:"short_desc"`
-		Content   string `json:"content" binding:"required"`
+		Title        string `json:"title" binding:"required"`
+		Featured     bool   `json:"featured"`
+		ShortDesc    string `json:"shortDesc"`
+		Content      string `json:"content" binding:"required"`
+		PreviewImage string `json:"previewImage"` // Новое поле
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -33,11 +32,12 @@ func CreatePost(c *gin.Context) {
 	}
 
 	post := models.Post{
-		Title:     input.Title,
-		Featured:  input.Featured,
-		ShortDesc: input.ShortDesc,
-		Content:   input.Content,
-		UserID:    userID.(uint), // приводим к uint
+		Title:        input.Title,
+		Featured:     input.Featured,
+		ShortDesc:    input.ShortDesc,
+		Content:      input.Content,
+		PreviewImage: input.PreviewImage,
+		UserID:       userID.(uint),
 	}
 
 	if err := database.DB.Create(&post).Error; err != nil {
@@ -86,17 +86,17 @@ func UpdatePost(c *gin.Context) {
 		return
 	}
 
-	// Разрешить обновление только, если текущий пользователь - автор поста
 	if post.UserID != userID.(uint) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You are not the author of this post"})
 		return
 	}
 
 	var input struct {
-		Title     *string `json:"title"`
-		Featured  *bool   `json:"featured"`
-		ShortDesc *string `json:"short_desc"`
-		Content   *string `json:"content"`
+		Title        *string `json:"title"`
+		Featured     *bool   `json:"featured"`
+		ShortDesc    *string `json:"shortDesc"`
+		Content      *string `json:"content"`
+		PreviewImage *string `json:"previewImage"` // Добавляем новое поле
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -115,6 +115,9 @@ func UpdatePost(c *gin.Context) {
 	}
 	if input.Content != nil {
 		post.Content = *input.Content
+	}
+	if input.PreviewImage != nil {
+		post.PreviewImage = *input.PreviewImage
 	}
 
 	if err := database.DB.Save(&post).Error; err != nil {
