@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("Failed to migrate: %v", err)
 	}
 
-	// // Выполнение сидеров
+	// Выполнение сидеров
 	// log.Println("Seeding database...")
 	// users := seeders.SeedUsers()
 	// seeders.SeedPosts(users)
