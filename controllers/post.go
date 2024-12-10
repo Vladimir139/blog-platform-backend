@@ -176,7 +176,12 @@ func LikePost(c *gin.Context) {
 }
 
 func GetUserPosts(c *gin.Context) {
-	userID, _ := c.Get("user_id")
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
 	var posts []models.Post
 	if err := database.DB.Where("user_id = ?", userID).Find(&posts).Error; err != nil {

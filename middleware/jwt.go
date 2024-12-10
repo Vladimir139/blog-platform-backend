@@ -2,13 +2,14 @@ package middleware
 
 import (
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-var jwtKey = []byte("your_secret_key") // Тот же ключ, что и при генерации токена
+var jwtKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET")) // Тот же ключ, что и при генерации токена
 
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -16,19 +16,18 @@ func Register(c *gin.Context) {
 		Email     string `json:"email" binding:"required,email"`
 		Password  string `json:"password" binding:"required,min=6"`
 	}
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Хешируем пароль
 	hashedPassword, err := utils.HashPassword(input.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password"})
 		return
 	}
 
-	// Создаем пользователя
 	user := models.User{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
@@ -41,14 +40,36 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
+	// Генерируем токены
+	accessToken, err := utils.GenerateAccessToken(user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating access token"})
+		return
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken(user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating refresh token"})
+		return
+	}
+
+	// Очищаем поле Password перед возвратом
+	user.Password = ""
+
+	// Возвращаем ответ с пользователем и токенами
+	c.JSON(http.StatusOK, gin.H{
+		"user":          user,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
 }
 
 func Login(c *gin.Context) {
 	var input struct {
-		Email    string `json:"email" binding:"required"`
+		Email    string `json:"email" binding:"required,email"`
 		Password string `json:"password" binding:"required"`
 	}
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -60,18 +81,62 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Проверка пароля
 	if !utils.CheckPasswordHash(input.Password, user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
-	// Генерация JWT токена
-	token, err := utils.GenerateJWT(user.Email)
+	accessToken, err := utils.GenerateAccessToken(user.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating access token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	refreshToken, err := utils.GenerateRefreshToken(user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating refresh token"})
+		return
+	}
+
+	// Очищаем поле Password перед возвратом
+	user.Password = ""
+
+	// Возвращаем ответ с пользователем и токенами
+	c.JSON(http.StatusOK, gin.H{
+		"user":          user,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
+}
+
+func Refresh(c *gin.Context) {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token cookie missing"})
+		return
+	}
+
+	claims, err := utils.ParseRefreshToken(refreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
+
+	newAccessToken, err := utils.GenerateAccessToken(claims.Subject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating new access token"})
+		return
+	}
+
+	newRefreshToken, err := utils.GenerateRefreshToken(claims.Subject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating new refresh token"})
+		return
+	}
+
+	// Возвращаем ответ с пользователем и токенами
+	c.JSON(http.StatusOK, gin.H{
+		"access_token":  newAccessToken,
+		"refresh_token": newRefreshToken,
+	})
 }
