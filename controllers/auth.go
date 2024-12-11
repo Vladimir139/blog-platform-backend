@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func Register(c *gin.Context) {
 	var input struct {
-		FirstName string `json:"first_name" binding:"required"`
-		LastName  string `json:"last_name" binding:"required"`
+		FirstName string `json:"firstName" binding:"required"`
+		LastName  string `json:"lastName" binding:"required"`
 		Email     string `json:"email" binding:"required,email"`
 		Password  string `json:"password" binding:"required,min=6"`
 	}
@@ -33,6 +34,7 @@ func Register(c *gin.Context) {
 		LastName:  input.LastName,
 		Email:     input.Email,
 		Password:  hashedPassword,
+		ID:        uuid.New().String(),
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -41,13 +43,13 @@ func Register(c *gin.Context) {
 	}
 
 	// Генерируем токены
-	accessToken, err := utils.GenerateAccessToken(user.Email)
+	accessToken, err := utils.GenerateAccessToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating access token"})
 		return
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.Email)
+	refreshToken, err := utils.GenerateRefreshToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating refresh token"})
 		return
@@ -86,13 +88,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := utils.GenerateAccessToken(user.Email)
+	accessToken, err := utils.GenerateAccessToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating access token"})
 		return
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.Email)
+	refreshToken, err := utils.GenerateRefreshToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating refresh token"})
 		return

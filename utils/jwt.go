@@ -15,10 +15,11 @@ var (
 )
 
 // GenerateAccessToken генерирует короткоживущий JWT access токен.
-func GenerateAccessToken(email string) (string, error) {
+// В поле Subject сохраняется ID пользователя, а не email.
+func GenerateAccessToken(userID string) (string, error) {
 	expirationTime := time.Now().Add(time.Hour) // 1 час жизни access токена
 	claims := &jwt.StandardClaims{
-		Subject:   email,
+		Subject:   userID, // Используем ID пользователя
 		ExpiresAt: expirationTime.Unix(),
 		IssuedAt:  time.Now().Unix(),
 		Issuer:    "blog-platform",
@@ -28,10 +29,10 @@ func GenerateAccessToken(email string) (string, error) {
 }
 
 // GenerateRefreshToken генерирует долгоживущий JWT refresh токен.
-func GenerateRefreshToken(email string) (string, error) {
+func GenerateRefreshToken(userID string) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 7 дней
 	claims := &jwt.StandardClaims{
-		Subject:   email,
+		Subject:   userID, // Используем ID пользователя
 		ExpiresAt: expirationTime.Unix(),
 		IssuedAt:  time.Now().Unix(),
 		Issuer:    "blog-platform",

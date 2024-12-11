@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var jwtKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET")) // Тот же ключ, что и при генерации токена
+var jwtKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -20,7 +20,6 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Ожидаем токен в формате "Bearer <token>"
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
@@ -28,7 +27,6 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Проверяем токен
 		claims := &jwt.StandardClaims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
@@ -39,8 +37,16 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Передаем user_id в контекст
-		c.Set("user_id", claims.Subject)
+		// Используем ID пользователя из claims.Subject
+		userIDStr := claims.Subject
+		if userIDStr == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user id"})
+			c.Abort()
+			return
+		}
+
+		// Передаём user_id в контекст
+		c.Set("user_id", userIDStr)
 		c.Next()
 	}
 }

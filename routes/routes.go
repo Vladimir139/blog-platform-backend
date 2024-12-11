@@ -47,6 +47,7 @@ func SetupRouter() *gin.Engine {
 	auth.POST("/posts/:id/like", controllers.LikePost)
 	auth.GET("/users/me/posts", controllers.GetUserPosts)
 	auth.GET("/users/me", controllers.GetMe)
+	auth.PUT("/users/me", controllers.UpdateMe)
 
 	return r
 }

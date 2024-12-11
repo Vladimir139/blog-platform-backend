@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,12 +15,14 @@ import (
 func SeedUsers() []models.User {
 	users := []models.User{
 		{
+			ID:        uuid.New().String(),
 			FirstName: "Иван",
 			LastName:  "Иванов",
 			Email:     "ivan@example.com",
 			Password:  hashPassword("password123"),
 		},
 		{
+			ID:        uuid.New().String(),
 			FirstName: "Анна",
 			LastName:  "Петрова",
 			Email:     "anna@example.com",
@@ -41,6 +44,7 @@ func SeedUsers() []models.User {
 func SeedPosts(users []models.User) {
 	posts := []models.Post{
 		{
+			ID:           uuid.New().String(),
 			Title:        "Уроки лидерства от Билла Уолша",
 			Featured:     true,
 			ShortDesc:    "Узнайте секреты превращения команды с 2-14 в 3-кратных победителей Супербоула.",
@@ -50,6 +54,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Искусство войны в бизнесе",
 			Featured:     false,
 			ShortDesc:    "Применение стратегий Сунь Цзы к современным бизнес-задачам.",
@@ -59,6 +64,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 2, 5, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Осознанность для продуктивности",
 			Featured:     false,
 			ShortDesc:    "Как практики осознанности повышают эффективность работы.",
@@ -68,6 +74,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 3, 12, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Исследуя космос",
 			Featured:     false,
 			ShortDesc:    "Путешествие по последним открытиям в космических исследованиях.",
@@ -77,6 +84,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 4, 22, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Здоровое питание на бюджете",
 			Featured:     false,
 			ShortDesc:    "Советы и хитрости для питательных блюд без лишних затрат.",
@@ -86,6 +94,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 5, 10, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Будущее искусственного интеллекта",
 			Featured:     false,
 			ShortDesc:    "Прогнозы и возможности ИИ в нашей жизни.",
@@ -95,6 +104,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 6, 18, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Путешествие по миру виртуально",
 			Featured:     false,
 			ShortDesc:    "Исследуйте мировые достопримечательности, не выходя из дома.",
@@ -104,6 +114,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 7, 27, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Основы устойчивого образа жизни",
 			Featured:     false,
 			ShortDesc:    "Простые шаги к снижению экологического следа.",
@@ -113,6 +124,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 8, 15, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Мастерство кулинарии",
 			Featured:     false,
 			ShortDesc:    "От новичка до шефа: ваш путь к успеху в кулинарии.",
@@ -122,6 +134,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 9, 30, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Технологии завтрашнего дня",
 			Featured:     true,
 			ShortDesc:    "Как современные технологии меняют будущее.",
@@ -131,6 +144,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 10, 12, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Искусство фотографии",
 			Featured:     false,
 			ShortDesc:    "Узнайте секреты создания захватывающих снимков.",
@@ -140,6 +154,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 11, 8, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Психология успеха",
 			Featured:     true,
 			ShortDesc:    "Как мышление влияет на достижение целей.",
@@ -149,6 +164,7 @@ func SeedPosts(users []models.User) {
 			CreatedAt:    time.Date(2023, 12, 15, 0, 0, 0, 0, time.UTC),
 		},
 		{
+			ID:           uuid.New().String(),
 			Title:        "Сила привычек",
 			Featured:     false,
 			ShortDesc:    "Как маленькие изменения приводят к большим результатам.",
