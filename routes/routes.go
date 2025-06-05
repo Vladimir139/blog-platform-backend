@@ -41,6 +41,10 @@ func SetupRouter() *gin.Engine {
 	// Публичный маршрут для пользователя
 	r.GET("/users/:id", controllers.GetUserByID)
 
+	// Авторы
+	r.GET("/authors", controllers.GetAuthors)
+	r.GET("/authors/:id", controllers.GetAuthorWithPosts)
+
 	// Маршруты под авторизацией
 	auth := r.Group("/")
 	auth.Use(middleware.JWTMiddleware())
@@ -57,6 +61,11 @@ func SetupRouter() *gin.Engine {
 	auth.GET("/users/me", controllers.GetMe)
 	auth.PUT("/users/me", controllers.UpdateMe)
 	auth.GET("/users/me/comment-reactions", controllers.GetMyCommentReactions)
+
+	auth.POST("/authors/:id/subscribe", controllers.SubscribeAuthor)
+	auth.DELETE("/authors/:id/subscribe", controllers.UnsubscribeAuthor)
+	auth.GET("/users/me/subscriptions", controllers.GetMySubscriptions)
+	auth.GET("/feed/posts", controllers.GetFeedPosts)
 
 	return r
 }

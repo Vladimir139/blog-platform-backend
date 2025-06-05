@@ -15,9 +15,16 @@ func main() {
 	database.Connect()
 
 	// Выполняем миграции (создание таблиц в БД)
-	err := database.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.Comment{}, &models.PostReaction{}, &models.CommentReaction{})
+	err := database.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.Comment{}, &models.PostReaction{}, &models.CommentReaction{}, &models.Subscription{}, &models.Notification{})
 	if err != nil {
 		log.Fatalf("Failed to migrate: %v", err)
+	}
+
+	if err := database.DB.Exec(`
+	CREATE UNIQUE INDEX IF NOT EXISTS idx_subs_unique
+	  ON user_subscriptions(follower_id, author_id);
+	`).Error; err != nil {
+		log.Fatalf("Failed to create index: %v", err)
 	}
 
 	// Выполнение сидеров
