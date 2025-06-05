@@ -3,7 +3,9 @@ package controllers
 import (
 	"blog-platform-backend/database"
 	"blog-platform-backend/models"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -44,6 +46,35 @@ func CreatePost(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create post"})
 		return
 	}
+
+	// Уведомления
+
+	go func(p models.Post) {
+		var followerIDs []string
+		database.DB.
+			Table("user_subscriptions").
+			Where("author_id = ?", p.UserID).
+			Pluck("follower_id", &followerIDs)
+
+		if len(followerIDs) == 0 {
+			return
+		}
+
+		now := time.Now()
+		notifs := make([]models.Notification, 0, len(followerIDs))
+		for _, uid := range followerIDs {
+			notifs = append(notifs, models.Notification{
+				ID:        uuid.New().String(),
+				UserID:    uid,
+				AuthorID:  p.UserID,
+				PostID:    p.ID,
+				Message:   fmt.Sprintf("Новый пост: %s", p.Title),
+				IsRead:    false,
+				CreatedAt: now,
+			})
+		}
+		database.DB.Create(&notifs)
+	}(post)
 
 	c.JSON(http.StatusOK, post)
 }

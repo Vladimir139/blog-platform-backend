@@ -48,6 +48,7 @@ func SetupRouter() *gin.Engine {
 	// Маршруты под авторизацией
 	auth := r.Group("/")
 	auth.Use(middleware.JWTMiddleware())
+
 	auth.POST("/posts", controllers.CreatePost)
 	auth.PUT("/posts/:id", controllers.UpdatePost)
 	auth.DELETE("/posts/:id", controllers.DeletePost)
@@ -66,6 +67,10 @@ func SetupRouter() *gin.Engine {
 	auth.DELETE("/authors/:id/subscribe", controllers.UnsubscribeAuthor)
 	auth.GET("/users/me/subscriptions", controllers.GetMySubscriptions)
 	auth.GET("/feed/posts", controllers.GetFeedPosts)
+
+	auth.GET("/users/me/notifications", controllers.GetMyNotifications)
+	auth.PUT("/notifications/:id/read", controllers.MarkNotificationRead)
+	auth.PUT("/notifications/read-all", controllers.MarkAllRead)
 
 	return r
 }

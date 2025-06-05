@@ -3,16 +3,16 @@ package models
 import "time"
 
 type Notification struct {
-	ID        string `gorm:"type:varchar(36);primaryKey"`
-	UserID    string `gorm:"type:varchar(36);index"` // получатель
-	AuthorID  string `gorm:"type:varchar(36);index"` // кто создал пост
-	PostID    string `gorm:"type:varchar(36);index"`
-	Message   string
-	IsRead    bool `gorm:"default:false"`
-	CreatedAt time.Time
+	ID        string    `gorm:"type:varchar(36);primaryKey" json:"id"`
+	UserID    string    `gorm:"type:varchar(36);index"      json:"userId"`
+	AuthorID  string    `gorm:"type:varchar(36);index"      json:"authorId"`
+	PostID    string    `gorm:"type:varchar(36);index"      json:"postId"`
+	Message   string    `json:"message"`
+	IsRead    bool      `gorm:"default:false"               json:"isRead"`
+	CreatedAt time.Time `json:"createdAt"`
 
-	Author User `gorm:"foreignKey:AuthorID;references:ID"`
-	Post   Post `gorm:"foreignKey:PostID;references:ID"`
+	Author User `json:"author" gorm:"foreignKey:AuthorID;references:ID"`
+	Post   Post `json:"post"   gorm:"foreignKey:PostID;references:ID"`
 }
 
 func (Notification) TableName() string { return "notifications" }
