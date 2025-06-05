@@ -52,7 +52,7 @@ func CreatePost(c *gin.Context) {
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
 
-	if err := database.DB.Preload("Author").Find(&posts).Error; err != nil {
+	if err := database.DB.Preload("Author").Preload("Comments").Preload("Comments.Author").Find(&posts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch posts"})
 		return
 	}
@@ -64,7 +64,7 @@ func GetPosts(c *gin.Context) {
 func GetPostByID(c *gin.Context) {
 	id := c.Param("id")
 	var post models.Post
-	if err := database.DB.Preload("Author").First(&post, "id = ?", id).Error; err != nil {
+	if err := database.DB.Preload("Author").Preload("Comments").Preload("Comments.Author").First(&post, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}

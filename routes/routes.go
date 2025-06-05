@@ -34,6 +34,9 @@ func SetupRouter() *gin.Engine {
 	// Публичные маршруты для постов
 	r.GET("/posts", controllers.GetPosts)
 	r.GET("/posts/:id", controllers.GetPostByID)
+	r.GET("/posts/:id/comments", controllers.GetCommentsByPost)
+	r.GET("/posts/popular", controllers.GetPopularPosts)
+	r.GET("/users/top", controllers.GetTopAuthors)
 
 	// Публичный маршрут для пользователя
 	r.GET("/users/:id", controllers.GetUserByID)
@@ -44,10 +47,16 @@ func SetupRouter() *gin.Engine {
 	auth.POST("/posts", controllers.CreatePost)
 	auth.PUT("/posts/:id", controllers.UpdatePost)
 	auth.DELETE("/posts/:id", controllers.DeletePost)
-	auth.POST("/posts/:id/like", controllers.LikePost)
+
+	auth.POST("/posts/:id/reaction", controllers.ReactPost)
+	auth.POST("/comments/:id/reaction", controllers.ReactComment)
+	auth.POST("/posts/:id/comments", controllers.CreateComment)
+
 	auth.GET("/users/me/posts", controllers.GetUserPosts)
+	auth.GET("/users/me/post-reactions", controllers.GetMyPostReactions)
 	auth.GET("/users/me", controllers.GetMe)
 	auth.PUT("/users/me", controllers.UpdateMe)
+	auth.GET("/users/me/comment-reactions", controllers.GetMyCommentReactions)
 
 	return r
 }

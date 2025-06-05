@@ -15,7 +15,7 @@ func main() {
 	database.Connect()
 
 	// Выполняем миграции (создание таблиц в БД)
-	err := database.DB.AutoMigrate(&models.User{}, &models.Post{})
+	err := database.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.Comment{}, &models.PostReaction{}, &models.CommentReaction{})
 	if err != nil {
 		log.Fatalf("Failed to migrate: %v", err)
 	}
